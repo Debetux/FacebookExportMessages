@@ -4,6 +4,8 @@
 virtualenv-3.4 -p /usr/local/bin/python3.4 develop
 source develop/bin/activate
 pip install -r requirements.txt
+cp settings.sample.py settings.py
+vim settings.py # Replace your tokens
 ```
 
 Now, to launch this app :
@@ -13,7 +15,7 @@ python run.py
 ```
 
 BIM BIM BAM BAM.
-Don't forget to create a Facebook Application and to replace your tokens.
+Don't forget to create a Facebook Application and to replace your tokens in settings.py (see settings.sample.py).
 
 ## Prod, with gunicorn and nginx
 
