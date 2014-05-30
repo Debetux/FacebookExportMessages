@@ -4,12 +4,9 @@ import requests
 import urllib
 import datetime
 import time
+import os
+from settings import *
 
-
-
-FACEBOOK_APP_ID = ""
-FACEBOOK_APP_SECRET = ""
-SECRET_KEY = ""
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -120,6 +117,8 @@ def download_thread_csv(thread_id):
     # This is the key: Set the right header for the response
     # to be downloaded, instead of just printed on the browser
     response.headers["Content-Disposition"] = "attachment; filename={}.csv".format(thread_id)
+    file.close()
+    
     return response
 
 
@@ -153,6 +152,13 @@ def login():
         return redirect(
             "https://graph.facebook.com/oauth/authorize?" +
             urllib.parse.urlencode(args))
+            
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+   session.pop('fb_user', None)
+   session.pop('fb_name', None)
+   session.pop('access_token', None)
+   return redirect(url_for('home'))
 
 
 

@@ -42,12 +42,15 @@
 					</table>
 
 					
-
-					<hr>
-					<h1>Request</h1>
-					<pre>
-						{{ hop }}
-					</pre>
+					{% if debug %}
+					
+						<hr>
+						<h1>Request</h1>
+						<pre>
+							{{ hop }}
+						</pre>
+					
+					{% endif %}
 
 				{% endif %}
 

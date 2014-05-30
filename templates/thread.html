@@ -5,20 +5,20 @@
 		<div class="row">
 			<div class="col-md-12">
 
-			<a type="button" class="btn btn-primary btn-lg" href="{{ url_for('download_thread', thread_id = threads['id']) }}">I'M A FUCKING LARGE BUTTON; DOWNLOAD</a>
+				<p><a type="button" class="btn btn-primary btn-lg" href="{{ url_for('download_thread', thread_id = threads['id']) }}">Generate CSV file</a></p>
 
 			<table class="table table-condensed">
 				<thead>
 					<tr>
-						<th>Date</th>
-						<th>From</th>
+						<th width="180px">Date</th>
+						<th width="180px">From</th>
 						<th>Message</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for message in threads['comments']['data'] %}
 
-						<tr>
+						<tr {% if message['from']['id'] == session['fb_user'] %} class="info" {% endif %} >
 							<td>{{ message['created_time']|strftime }}</td>
 							<td>{{ message['from']['name'] }}</td>
 							<td>
@@ -38,10 +38,12 @@
 				
 
 				<hr>
-				<h1>Request</h1>
-				<pre>
-					{{ hop }}
-				</pre>
+				{% if debug %}
+					<h1>Request</h1>
+					<pre>
+						{{ hop }}
+					</pre>
+				{% endif %}
 
 			</div>
 		</div>
