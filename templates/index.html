@@ -8,7 +8,7 @@
 				{% if not logged_in %}
 					<a class="btn btn-default" href="/login">Login !</a>
 				{% else %}
-					<h1>Hi {{ session['fb_user'] }} !</h1>
+					<h1>Hi {{ session['fb_name'] }} !</h1>
 				{% endif %}
 
 				<hr>

@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, request, render_template, url_for, session, escape, session
+from flask import Flask, flash, redirect, request, render_template, url_for, session, escape, session, make_response
 import json
 import requests
 import urllib
@@ -9,7 +9,7 @@ import time
 
 FACEBOOK_APP_ID = ""
 FACEBOOK_APP_SECRET = ""
-SECRET_KEY = "DZDZ"
+SECRET_KEY = ""
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -31,8 +31,6 @@ def home():
 
         try:
             hop = json.loads(urllib.request.urlopen( "https://graph.facebook.com/me/inbox?" + urllib.parse.urlencode(dict(access_token=access_token))).read().decode('utf-8'))
-            # hop = json.dumps(hop, indent=4, sort_keys=True)
-            # print(hop)
 
         except urllib.error.HTTPError as e:
             hop = "https://graph.facebook.com/me/inbox?" + urllib.parse.urlencode(dict(access_token=access_token))
@@ -75,17 +73,13 @@ def download_thread(thread_id):
         msg_count = 0
         reqs = 0
 
+        # if request['data'] is empty, there isn't more data to retrieve via the API.
         while len(request['data']) > 0:
             reqs += 1
             time.sleep(1.1)
 
             for message in reversed(request['data']):
                 if 'message' in message:
-                    # print(message['message'].encode('utf-8'))
-
-#                     file.write("""
-# \n
-#                     """.format(name = message['from']['name'].encode('utf-8'), date = message['created_time'].encode('utf-8'), message = message['message'].encode('utf-8') ))
                     csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), message['message'].encode('utf-8')])
                 else:
                     csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), ""])
@@ -110,19 +104,30 @@ def download_thread(thread_id):
             # file.seek(0)
 
         file.close()
-        print(msg_count)
-        print(reqs)
+        print('Message count :', msg_count)
+        print('Number of request :', reqs)
 
-    return render_template('downloaded.html', endr = request)
+    return render_template('downloaded.html', endr = request, msg_count = msg_count, requests_count = reqs, thread_id = thread_id)
 
 
-
+@app.route('/download/<thread_id>.csv', methods=['GET', 'POST'])
+def download_thread_csv(thread_id):
+    file = open('data/{}.csv'.format(thread_id), 'r')
+    csv = file.read()
+    # We need to modify the response, so the first thing we 
+    # need to do is create a response out of the CSV string
+    response = make_response(csv)
+    # This is the key: Set the right header for the response
+    # to be downloaded, instead of just printed on the browser
+    response.headers["Content-Disposition"] = "attachment; filename={}.csv".format(thread_id)
+    return response
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     verification_code = request.args.get("code")
 
+    """ Auth with Facebook is very simple. """
     args = dict(client_id=FACEBOOK_APP_ID,
                 redirect_uri=url_for('login', _external=True), scope="read_mailbox")
 
@@ -141,6 +146,7 @@ def login():
             urllib.request.urlopen( "https://graph.facebook.com/me?" + urllib.parse.urlencode(dict(access_token=access_token))).read().decode('utf-8') )
 
         session['fb_user'] = str(profile["id"])
+        session['fb_name'] = str(profile["name"])
         session['access_token'] = access_token
         return redirect("/")
     else:

@@ -6,6 +6,12 @@
 			<div class="col-md-12">
 
 				<h1>DONE, YOU ROCK</h1>
+				
+				<p>CSV generated {{ msg_count }} messages with {{ requests_count }} requests. <br>
+					<a href="{{ url_for('download_thread_csv', thread_id = thread_id) }}">Download link.</a>
+				</p>
+
+
 
 				<pre>{{ endr }}</pre>
 
