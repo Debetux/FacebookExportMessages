@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+
+				{% if not logged_in %}
+					<a class="btn btn-default" href="/login">Login !</a>
+				{% else %}
+					<h1>Hi {{ session['fb_user'] }} !</h1>
+				{% endif %}
+
+				<hr>
+
+				<table class="table table-condensed">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>ID</th>
+							<th>Recipients</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for thread in threads['data'] %}
+
+							<tr>
+								<td>#</td>
+								<td><a href="thread/{{ thread['id'] }}">{{ thread['id'] }}</a></td>
+								<td>
+										{% for recipient in thread['to']['data'] %}
+											{% if recipient['id'] != session['fb_user'] %}
+												{{ recipient['name'] }},
+											{% endif %}
+										{% endfor %}		
+
+								</td>
+							</tr>
+
+						{% endfor %}
+					</tbody>
+				</table>
+
+				
+
+				<hr>
+				<h1>Request</h1>
+				<pre>
+					{{ hop }}
+				</pre>
+
+			</div>
+		</div>
+
+</div><!-- /.container -->
+{% endblock %}
