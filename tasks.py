@@ -81,7 +81,7 @@ def generate_csv(access_token, thread_id):
                      text_body="Hello, {} messages for {} requests".format(msg_count, reqs),
                      tag="hello",
                      attachments=[
-                        ('history.csv', encoded,'application/octet-stream')
+                        ('history.csv', encoded, 'application/octet-stream')
                      ])
 
     message.send()

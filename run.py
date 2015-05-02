@@ -60,7 +60,7 @@ def download_thread(thread_id):
 
     if 'fb_user' in session:
         access_token = session['access_token']
-        tasks.generate_csv(access_token, thread_id)
+        tasks.generate_csv.delay(access_token, thread_id)
 
     return render_template('pending.html')
 
