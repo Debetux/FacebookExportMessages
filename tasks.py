@@ -1,6 +1,11 @@
 from celery import Celery
 from settings import CELERY_RESULT_BACKEND, BROKER_URL, POSTMARK_API_TOKEN, POSTMARK_SENDER
-from postmark import PMMail
+import smtplib
+from os.path import basename
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import COMMASPACE, formatdate
 
 app = Celery('example')
 app.conf.update(BROKER_URL=BROKER_URL,
@@ -11,15 +16,32 @@ app.conf.update(BROKER_URL=BROKER_URL,
 
 @app.task
 def add(x, y):
-    message = PMMail(api_key=POSTMARK_API_TOKEN,
-                     subject="Hello from Postmark",
-                     sender=POSTMARK_SENDER,
-                     to="debetux@gmail.com",
-                     text_body="Hello {}".format(x + y),
-                     tag="hello")
-
-    message.send()
     return x + y
+
+
+def send_mail(send_from, send_to, subject, text, files=None,
+              server="127.0.0.1"):
+    assert isinstance(send_to, list)
+
+    msg = MIMEMultipart(
+        From=send_from,
+        To=COMMASPACE.join(send_to),
+        Date=formatdate(localtime=True),
+        Subject=subject
+    )
+    msg.attach(MIMEText(text))
+
+    for f in files or []:
+        with open(f, "rb") as fil:
+            msg.attach(MIMEApplication(
+                fil.read(),
+                Content_Disposition='attachment; filename="%s"' % basename(f)
+            ))
+
+    smtp = smtplib.SMTP(server)
+    smtp.login(POSTMARK_API_TOKEN, POSTMARK_API_TOKEN)
+    smtp.sendmail(send_from, send_to, msg.as_string())
+    smtp.close()
 
 
 @app.task
@@ -59,7 +81,7 @@ def generate_csv(access_token, thread_id):
                 except urllib.error.HTTPError as e:
                     print(e)
                     print('URL :', request['paging']['next'])
-                    time.sleep(tried*80)
+                    time.sleep(tried * 80)
                     continue
                 break
 
@@ -71,18 +93,5 @@ def generate_csv(access_token, thread_id):
     file.close()
     print('Message count :', msg_count)
     print('Number of request :', reqs)
-    data = open('data/{}.csv'.format(thread_id), 'rb').read()
-    encoded = base64.b64encode(data)
-
-    message = PMMail(api_key=POSTMARK_API_TOKEN,
-                     subject="CSV Generated for {}".format(thread_id),
-                     sender=POSTMARK_SENDER,
-                     to="debetux@gmail.com",
-                     text_body="Hello, {} messages for {} requests".format(msg_count, reqs),
-                     tag="hello",
-                     attachments=[
-                        ('history.csv', encoded, 'application/octet-stream')
-                     ])
-
-    message.send()
+    send_mail(POSTMARK_SENDER, 'debetux@gmail.com', 'FacebookExportMessages', "Hello, {} messages for {} requests".format(msg_count, reqs), 'smtp.postmarkapp.com', ['data/{}.csv'.format(thread_id)])
     return 'Done'
