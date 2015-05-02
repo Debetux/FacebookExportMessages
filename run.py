@@ -5,17 +5,20 @@ import urllib
 import datetime
 import time
 import os
+import tasks
 from settings import *
 
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+
 @app.template_filter('strftime')
 def _jinja2_filter_datetime(date_arg, fmt=None):
     date = datetime.datetime.strptime(date_arg, '%Y-%m-%dT%X%z')
     # date = datetime.datetime(date_arg)
     return date.strftime('%b %d %Y %H:%M:%S')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -32,8 +35,8 @@ def home():
         except urllib.error.HTTPError as e:
             hop = "https://graph.facebook.com/me/inbox?" + urllib.parse.urlencode(dict(access_token=access_token))
 
-
     return render_template('index.html', session = session, hop = hop, threads = hop, logged_in = logged_in)
+
 
 @app.route('/thread/<thread_id>', methods=['GET', 'POST'])
 def view_thread(thread_id):
@@ -48,7 +51,7 @@ def view_thread(thread_id):
 
         except urllib.error.HTTPError as e:
             hop = "https://graph.facebook.com/me/inbox?" + urllib.parse.urlencode(dict(access_token=access_token))
-
+        tasks.add.delay(14, 26)
 
     return render_template('thread.html', session = session, hop = hop, threads = hop, logged_in = logged_in)
 
@@ -65,7 +68,7 @@ def download_thread(thread_id):
         """ Prepare file """
         file = open('data/{}.csv'.format(thread_id), 'w', newline='')
         csvfile = csv.writer(file)
-        
+
         request = json.loads(urllib.request.urlopen( "https://graph.facebook.com/{}/comments?".format(thread_id) + urllib.parse.urlencode(dict(access_token=access_token, limit=30))).read().decode('utf-8'))
         msg_count = 0
         reqs = 0
@@ -118,7 +121,7 @@ def download_thread_csv(thread_id):
     # to be downloaded, instead of just printed on the browser
     response.headers["Content-Disposition"] = "attachment; filename={}.csv".format(thread_id)
     file.close()
-    
+
     return response
 
 
@@ -136,7 +139,7 @@ def login():
         response = urllib.parse.parse_qs(urllib.request.urlopen(
             "https://graph.facebook.com/oauth/access_token?" +
             urllib.parse.urlencode(args)).read().decode('utf-8'))
-            
+
         access_token = response['access_token'][-1]
 
         # Download the user profile and cache a local instance of the
@@ -152,16 +155,15 @@ def login():
         return redirect(
             "https://graph.facebook.com/oauth/authorize?" +
             urllib.parse.urlencode(args))
-            
+
+
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-   session.pop('fb_user', None)
-   session.pop('fb_name', None)
-   session.pop('access_token', None)
-   return redirect(url_for('home'))
-
+    session.pop('fb_user', None)
+    session.pop('fb_name', None)
+    session.pop('access_token', None)
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5151, debug=True)
-
