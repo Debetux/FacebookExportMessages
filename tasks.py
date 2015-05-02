@@ -66,10 +66,13 @@ def generate_csv(access_token, thread_id):
     requests.post(
         "https://api.mailgun.net/v3/app80543588b752474a9dcfdb06376844b4.mailgun.org/messages",
         auth=("api", MAILGUN_API_KEY),
-        files=[("attachment", 'data/{}.csv'.format(thread_id))],
-        data={"from": "Excited User <app36434178@heroku.com>",
+        files=[("history.csv", 'data/{}.csv'.format(thread_id))],
+        data={
+            "from": "Excited User <app36434178@heroku.com>",
             "to": "debetux@gmail.com",
             "subject": "Hello",
             "text": "Hello, {} messages for {} requests".format(msg_count, reqs),
-            "html": "Hello, {} messages for {} requests".format(msg_count, reqs)})
+            "html": "Hello, {} messages for {} requests".format(msg_count, reqs)
+        }
+    )
     return 'Done'
