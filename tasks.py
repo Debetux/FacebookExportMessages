@@ -31,7 +31,7 @@ def generate_csv(access_token, thread_id):
     import base64
 
     """ Prepare file """
-    file = open('data/{}.csv'.format(thread_id), 'wb')
+    file = open('data/{}.csv'.format(thread_id), 'w')
     csvfile = csv.writer(file)
 
     request = json.loads(urllib.request.urlopen( "https://graph.facebook.com/{}/comments?".format(thread_id) + urllib.parse.urlencode(dict(access_token=access_token, limit=30))).read().decode('utf-8'))
@@ -71,7 +71,7 @@ def generate_csv(access_token, thread_id):
     file.close()
     print('Message count :', msg_count)
     print('Number of request :', reqs)
-    data = open('data/{}.csv'.format(thread_id), 'rb').read()
+    data = open('data/{}.csv'.format(thread_id), 'r').read()
     encoded = base64.b64encode(data)
 
     message = PMMail(api_key=POSTMARK_API_TOKEN,
