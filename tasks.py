@@ -1,5 +1,5 @@
 from celery import Celery
-from settings import CELERY_RESULT_BACKEND, BROKER_URL, POSTMARK_API_TOKEN
+from settings import CELERY_RESULT_BACKEND, BROKER_URL, POSTMARK_API_TOKEN, POSTMARK_SENDER
 from postmark import PMMail
 
 app = Celery('example')
@@ -13,7 +13,7 @@ app.conf.update(BROKER_URL=BROKER_URL,
 def add(x, y):
     message = PMMail(api_key=POSTMARK_API_TOKEN,
                      subject="Hello from Postmark",
-                     sender="leonard@bigbangtheory.com",
+                     sender=POSTMARK_SENDER,
                      to="debetux@gmail.com",
                      text_body="Hello {}".format(x + y),
                      tag="hello")
