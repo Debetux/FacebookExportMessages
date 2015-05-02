@@ -93,5 +93,11 @@ def generate_csv(access_token, thread_id):
     file.close()
     print('Message count :', msg_count)
     print('Number of request :', reqs)
-    send_mail(POSTMARK_SENDER, ['debetux@gmail.com'], 'FacebookExportMessages', "Hello, {} messages for {} requests".format(msg_count, reqs), 'smtp.postmarkapp.com', ['data/{}.csv'.format(thread_id)])
+    send_mail(
+        POSTMARK_SENDER,
+        ['debetux@gmail.com'],
+        'FacebookExportMessages', "Hello, {} messages for {} requests".format(msg_count, reqs),
+        ['data/{}.csv'.format(thread_id)],
+        'smtp.postmarkapp.com'
+    )
     return 'Done'
