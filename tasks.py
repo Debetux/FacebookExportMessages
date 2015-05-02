@@ -1,6 +1,6 @@
 from celery import Celery
-from settings import CELERY_RESULT_BACKEND, BROKER_URL, MANDRILL_APIKEY
-import mandrill
+from settings import CELERY_RESULT_BACKEND, BROKER_URL, POSTMARK_API_TOKEN
+from postmark import PMMail
 
 app = Celery('example')
 app.conf.update(BROKER_URL=BROKER_URL,
@@ -9,19 +9,14 @@ app.conf.update(BROKER_URL=BROKER_URL,
                 CELERY_ACCEPT_CONTENT=['json'])
 
 
-def send_mail(email_to, message):
-    mandrill_client = mandrill.Mandrill(MANDRILL_APIKEY)
-    message = {
-        'to': [],
-        'global_merge_vars': []
-    }
-    for em in email_to:
-        message['to'].append({'email': em})
-
-    mandrill_client.messages.send(message=message)
-
-
 @app.task
 def add(x, y):
-    send_mail(['debetux@gmail.com'], 'email test: {}'.format(x + y))
+    message = PMMail(api_key=POSTMARK_API_TOKEN,
+                     subject="Hello from Postmark",
+                     sender="leonard@bigbangtheory.com",
+                     to="debetux@gmail.com",
+                     text_body="Hello {}".format(x + y),
+                     tag="hello")
+
+    message.send()
     return x + y

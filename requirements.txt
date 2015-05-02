@@ -6,4 +6,4 @@ itsdangerous
 requests
 gunicorn
 celery[redis]
-mandrill
+python-postmark
