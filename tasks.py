@@ -20,47 +20,49 @@ def generate_csv(access_token, thread_id):
     import json
     import urllib.request
     import time
-    # import tarfile
+    import tarfile
+    import os.path
 
     """ Prepare file """
-    file = open('data/{}.csv'.format(thread_id), 'w')
-    csvfile = csv.writer(file)
+    if not os.path.isfile('data/{}.csv'.format(thread_id)):
+        file = open('data/{}.csv'.format(thread_id), 'w')
+        csvfile = csv.writer(file)
 
-    request = json.loads(urllib.request.urlopen( "https://graph.facebook.com/{}/comments?".format(thread_id) + urllib.parse.urlencode(dict(access_token=access_token, limit=30))).read().decode('utf-8'))
-    msg_count = 0
-    reqs = 0
+        request = json.loads(urllib.request.urlopen( "https://graph.facebook.com/{}/comments?".format(thread_id) + urllib.parse.urlencode(dict(access_token=access_token, limit=30))).read().decode('utf-8'))
+        msg_count = 0
+        reqs = 0
 
-    # if request['data'] is empty, there isn't more data to retrieve via the API.
-    while len(request['data']) > 0:
-        reqs += 1
-        time.sleep(1.1)
+        # if request['data'] is empty, there isn't more data to retrieve via the API.
+        while len(request['data']) > 0:
+            reqs += 1
+            time.sleep(1.1)
 
-        for message in reversed(request['data']):
-            if 'message' in message:
-                csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), message['message'].encode('utf-8')])
-            else:
-                csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), ""])
-            msg_count += 1
+            for message in reversed(request['data']):
+                if 'message' in message:
+                    csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), message['message'].encode('utf-8')])
+                else:
+                    csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), ""])
+                msg_count += 1
 
-        if request['paging']['next']:
-            tried = 0
-            while True:
-                tried += 1
-                try:
-                    request_new = json.loads(urllib.request.urlopen( request['paging']['next']).read().decode('utf-8'))
-                except urllib.error.HTTPError as e:
-                    print(e)
-                    print('URL :', request['paging']['next'])
-                    time.sleep(tried * 80)
-                    continue
-                break
+            if request['paging']['next']:
+                tried = 0
+                while True:
+                    tried += 1
+                    try:
+                        request_new = json.loads(urllib.request.urlopen( request['paging']['next']).read().decode('utf-8'))
+                    except urllib.error.HTTPError as e:
+                        print(e)
+                        print('URL :', request['paging']['next'])
+                        time.sleep(tried * 80)
+                        continue
+                    break
 
-            request = None
-            request = request_new
+                request = None
+                request = request_new
 
-        # file.seek(0)
+            # file.seek(0)
 
-    file.close()
+        file.close()
 
     tar = tarfile.open("data/{}.tar.gz".format(thread_id), "w:gz")
     tar.add('data/{}.csv'.format(thread_id))
