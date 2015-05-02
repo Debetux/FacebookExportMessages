@@ -48,7 +48,7 @@ def send_mail(send_from, send_to, subject, text, files=None,
 def generate_csv(access_token, thread_id):
     import csv
     import json
-    import urllib
+    import urllib.request
     import time
     import base64
 
