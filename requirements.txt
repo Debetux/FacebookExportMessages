@@ -5,4 +5,4 @@ Werkzeug
 itsdangerous
 requests
 gunicorn
-celery
+celery[redis]
