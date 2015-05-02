@@ -85,3 +85,4 @@ def generate_csv(access_token, thread_id):
                      ])
 
     message.send()
+    return 'Done'
