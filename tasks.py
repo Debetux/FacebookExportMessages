@@ -23,14 +23,15 @@ def generate_csv(access_token, thread_id):
     import tarfile
     import os.path
 
+    msg_count = 0
+    reqs = 0
+
     """ Prepare file """
     if not os.path.isfile('data/{}.csv'.format(thread_id)):
         file = open('data/{}.csv'.format(thread_id), 'w')
         csvfile = csv.writer(file)
 
         request = json.loads(urllib.request.urlopen( "https://graph.facebook.com/{}/comments?".format(thread_id) + urllib.parse.urlencode(dict(access_token=access_token, limit=30))).read().decode('utf-8'))
-        msg_count = 0
-        reqs = 0
 
         # if request['data'] is empty, there isn't more data to retrieve via the API.
         while len(request['data']) > 0:
