@@ -28,7 +28,7 @@ def generate_csv(access_token, thread_id):
 
     """ Prepare file """
     if not os.path.isfile('data/{}.csv'.format(thread_id)):
-        file = open('data/{}.csv'.format(thread_id), 'wb', newline='', encoding='utf-8')
+        file = open('data/{}.csv'.format(thread_id), 'w', newline='', encoding='utf-8')
         csvfile = csv.writer(file)
 
         request = json.loads(urllib.request.urlopen( "https://graph.facebook.com/{}/comments?".format(thread_id) + urllib.parse.urlencode(dict(access_token=access_token, limit=30))).read().decode('utf-8'))
@@ -36,7 +36,7 @@ def generate_csv(access_token, thread_id):
         # if request['data'] is empty, there isn't more data to retrieve via the API.
         while len(request['data']) > 0:
             reqs += 1
-            time.sleep(1.1)
+            time.sleep(1)
 
             for message in reversed(request['data']):
                 if 'message' in message:
