@@ -45,7 +45,7 @@ def generate_csv(access_token, thread_id):
 
         for message in reversed(request['data']):
             if 'message' in message:
-                csvfile.writerow([ message['from']['name'], message['created_time'], message['message']])
+                csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), message['message'].encode('utf-8')])
             else:
                 csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), ""])
             msg_count += 1
