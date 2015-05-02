@@ -20,6 +20,7 @@ def generate_csv(access_token, thread_id):
     import json
     import urllib.request
     import time
+    # import tarfile
 
     """ Prepare file """
     file = open('data/{}.csv'.format(thread_id), 'w')
@@ -60,13 +61,18 @@ def generate_csv(access_token, thread_id):
         # file.seek(0)
 
     file.close()
+
+    # tar = tarfile.open("data/{}.tar.gz".format(thread_id), "w:gz")
+    # tar.add('data/{}.csv'.format(thread_id))
+    # tar.close()
+
     print('Message count :', msg_count)
     print('Number of request :', reqs)
 
     requests.post(
         "https://api.mailgun.net/v3/app80543588b752474a9dcfdb06376844b4.mailgun.org/messages",
         auth=("api", MAILGUN_API_KEY),
-        files=[("history.csv", 'data/{}.csv'.format(thread_id))],
+        files=[("history.csv", open('data/{}.csv'.format(thread_id)))],
         data={
             "from": "Excited User <app36434178@heroku.com>",
             "to": "debetux@gmail.com",
