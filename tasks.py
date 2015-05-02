@@ -71,7 +71,7 @@ def generate_csv(access_token, thread_id):
     file.close()
     print('Message count :', msg_count)
     print('Number of request :', reqs)
-    data = open('data/{}.csv'.format(thread_id), 'r').read()
+    data = open('data/{}.csv'.format(thread_id), 'rb').read()
     encoded = base64.b64encode(data)
 
     message = PMMail(api_key=POSTMARK_API_TOKEN,
