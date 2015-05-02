@@ -31,7 +31,7 @@ def generate_csv(access_token, thread_id):
     import base64
 
     """ Prepare file """
-    file = open('data/{}.csv'.format(thread_id), 'w')
+    file = open('data/{}.csv'.format(thread_id), 'wb')
     csvfile = csv.writer(file)
 
     request = json.loads(urllib.request.urlopen( "https://graph.facebook.com/{}/comments?".format(thread_id) + urllib.parse.urlencode(dict(access_token=access_token, limit=30))).read().decode('utf-8'))
@@ -45,7 +45,7 @@ def generate_csv(access_token, thread_id):
 
         for message in reversed(request['data']):
             if 'message' in message:
-                csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), message['message'].encode('utf-8')])
+                csvfile.writerow([ message['from']['name'], message['created_time'], message['message']])
             else:
                 csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), ""])
             msg_count += 1
