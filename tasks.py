@@ -9,7 +9,7 @@ app.conf.update(BROKER_URL=BROKER_URL,
                 CELERY_ACCEPT_CONTENT=['json'])
 
 
-def send_mail(email_to, context):
+def send_mail(email_to, message):
     mandrill_client = mandrill.Mandrill(MANDRILL_APIKEY)
     message = {
         'to': [],
@@ -18,14 +18,10 @@ def send_mail(email_to, context):
     for em in email_to:
         message['to'].append({'email': em})
 
-    for k, v in context.iteritems():
-        message['global_merge_vars'].append(
-            {'name': k, 'content': v}
-        )
     mandrill_client.messages.send(message=message)
 
 
 @app.task
 def add(x, y):
-    send_mail('debetux@gmail.com', 'email test: {}'.format(x + y))
+    send_mail(['debetux@gmail.com'], 'email test: {}'.format(x + y))
     return x + y
