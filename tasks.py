@@ -1,11 +1,6 @@
 from celery import Celery
-from settings import CELERY_RESULT_BACKEND, BROKER_URL, POSTMARK_API_TOKEN, POSTMARK_SENDER
-import smtplib
-from os.path import basename
-from email.mime.application import MIMEApplication
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.utils import COMMASPACE, formatdate
+from settings import CELERY_RESULT_BACKEND, BROKER_URL, MAILGUN_API_KEY, MAILGUN_SENDER
+import requests
 
 app = Celery('example')
 app.conf.update(BROKER_URL=BROKER_URL,
@@ -19,38 +14,12 @@ def add(x, y):
     return x + y
 
 
-def send_mail(send_from, send_to, subject, text, files=None,
-              server="127.0.0.1"):
-    assert isinstance(send_to, list)
-
-    msg = MIMEMultipart(
-        From=send_from,
-        To=COMMASPACE.join(send_to),
-        Date=formatdate(localtime=True),
-        Subject=subject
-    )
-    msg.attach(MIMEText(text))
-
-    for f in files or []:
-        with open(f, "rb") as fil:
-            msg.attach(MIMEApplication(
-                fil.read(),
-                Content_Disposition='attachment; filename="%s"' % basename(f)
-            ))
-
-    smtp = smtplib.SMTP(server)
-    smtp.login(POSTMARK_API_TOKEN, POSTMARK_API_TOKEN)
-    smtp.sendmail(send_from, send_to, msg.as_string())
-    smtp.close()
-
-
 @app.task
 def generate_csv(access_token, thread_id):
     import csv
     import json
     import urllib.request
     import time
-    import base64
 
     """ Prepare file """
     file = open('data/{}.csv'.format(thread_id), 'w')
@@ -93,11 +62,14 @@ def generate_csv(access_token, thread_id):
     file.close()
     print('Message count :', msg_count)
     print('Number of request :', reqs)
-    send_mail(
-        POSTMARK_SENDER,
-        ['debetux@gmail.com'],
-        'FacebookExportMessages', "Hello, {} messages for {} requests".format(msg_count, reqs),
-        ['data/{}.csv'.format(thread_id)],
-        'smtp.postmarkapp.com'
-    )
+
+    requests.post(
+        "https://api.mailgun.net/v3/app80543588b752474a9dcfdb06376844b4.mailgun.org/messages",
+        auth=("api", MAILGUN_API_KEY),
+        files=[("attachment", 'data/{}.csv'.format(thread_id))],
+        data={"from": "Excited User <app36434178@heroku.com>",
+            "to": "debetux@gmail.com",
+            "subject": "Hello",
+            "text": "Hello, {} messages for {} requests".format(msg_count, reqs),
+            "html": "Hello, {} messages for {} requests".format(msg_count, reqs)})
     return 'Done'
