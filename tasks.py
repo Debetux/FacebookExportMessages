@@ -28,7 +28,7 @@ def generate_csv(access_token, thread_id):
 
     """ Prepare file """
     if not os.path.isfile('data/{}.csv'.format(thread_id)):
-        file = open('data/{}.csv'.format(thread_id), 'w')
+        file = open('data/{}.csv'.format(thread_id), 'wb', newline='', encoding='utf-8')
         csvfile = csv.writer(file)
 
         request = json.loads(urllib.request.urlopen( "https://graph.facebook.com/{}/comments?".format(thread_id) + urllib.parse.urlencode(dict(access_token=access_token, limit=30))).read().decode('utf-8'))
@@ -40,9 +40,9 @@ def generate_csv(access_token, thread_id):
 
             for message in reversed(request['data']):
                 if 'message' in message:
-                    csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), message['message'].encode('utf-8')])
+                    csvfile.writerow([ message['from']['name'], message['created_time'], message['message']])
                 else:
-                    csvfile.writerow([ message['from']['name'].encode('utf-8'), message['created_time'].encode('utf-8'), ""])
+                    csvfile.writerow([ message['from']['name'], message['created_time'], ""])
                 msg_count += 1
 
             if request['paging']['next']:
@@ -68,9 +68,6 @@ def generate_csv(access_token, thread_id):
     tar = tarfile.open("data/{}.tar.gz".format(thread_id), "w:gz")
     tar.add('data/{}.csv'.format(thread_id))
     tar.close()
-
-    print('Message count :', msg_count)
-    print('Number of request :', reqs)
 
     requests.post(
         "https://api.mailgun.net/v3/app80543588b752474a9dcfdb06376844b4.mailgun.org/messages",
