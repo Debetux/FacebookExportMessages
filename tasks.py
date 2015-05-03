@@ -15,7 +15,7 @@ def add(x, y):
 
 
 @app.task
-def generate_csv(access_token, thread_id):
+def generate_csv(access_token, email, thread_id):
     import csv
     import json
     import urllib.request
@@ -74,9 +74,9 @@ def generate_csv(access_token, thread_id):
         auth=("api", MAILGUN_API_KEY),
         files=[("attachment", open("data/{}.tar.gz".format(thread_id), 'rb'))],
         data={
-            "from": "Excited User <app36434178@heroku.com>",
-            "to": "debetux@gmail.com",
-            "subject": "Hello",
+            "from": "Facebook Export Messages <app36434178@heroku.com>",
+            "to": email,
+            "subject": "Your conversations {}".format(thread_id),
             "text": "Hello, {} messages for {} requests, in tar".format(msg_count, reqs),
             "html": "Hello, {} messages for {} requests, in tar".format(msg_count, reqs)
         }

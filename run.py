@@ -60,7 +60,7 @@ def download_thread(thread_id):
 
     if 'fb_user' in session:
         access_token = session['access_token']
-        tasks.generate_csv.delay(access_token, thread_id)
+        tasks.generate_csv.delay(access_token, session['email'], thread_id)
 
     return render_template('pending.html')
 
@@ -86,7 +86,7 @@ def login():
 
     """ Auth with Facebook is very simple. """
     args = dict(client_id=FACEBOOK_APP_ID,
-                redirect_uri=url_for('login', _external=True), scope="read_mailbox")
+                redirect_uri=url_for('login', _external=True), scope="read_mailbox, email")
 
     if request.args.get("code"):
         args["client_secret"] = FACEBOOK_APP_SECRET
@@ -104,6 +104,7 @@ def login():
 
         session['fb_user'] = str(profile["id"])
         session['fb_name'] = str(profile["name"])
+        session['email'] = str(profile["email"])
         session['access_token'] = access_token
         return redirect("/")
     else:
@@ -116,6 +117,7 @@ def login():
 def logout():
     session.pop('fb_user', None)
     session.pop('fb_name', None)
+    session.pop('email', None)
     session.pop('access_token', None)
     return redirect(url_for('home'))
 
