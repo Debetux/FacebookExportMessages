@@ -1,19 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-		<div class="row">
-			<div class="col-md-12">
+
+			<div class="twelve columns">
 
 				{% if not logged_in %}
 					<a class="btn btn-default" href="/login">Login !</a>
 				{% else %}
-					<h1>Hi {{ session['fb_name'] }} !</h1>
+					<h2>Hi {{ session['fb_name'] }} !</h2>
 				
 
 					<hr>
 
-					<table class="table table-condensed">
+					<table class="u-full-width">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -55,7 +54,5 @@
 				{% endif %}
 
 			</div>
-		</div>
 
-</div><!-- /.container -->
 {% endblock %}

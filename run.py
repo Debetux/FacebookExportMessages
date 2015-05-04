@@ -9,6 +9,9 @@ import tasks
 from settings import *
 
 if __name__ == '__main__':
+    import sys
+    import glob
+
     if 'test' in sys.argv:
         env_dir = os.path.join('tests', 'envdir')
     else:

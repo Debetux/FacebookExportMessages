@@ -1,52 +1,49 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-		<div class="row">
-			<div class="col-md-12">
 
-				<p><a type="button" class="btn btn-primary btn-lg" href="{{ url_for('download_thread', thread_id = threads['id']) }}">Generate CSV file</a></p>
+<div class="twelve columns">
+	
+	<p><a type="button" class="button button-primary" href="{{ url_for('download_thread', thread_id = threads['id']) }}">Generate CSV file</a></p>
 
-			<table class="table table-condensed">
-				<thead>
-					<tr>
-						<th width="180px">Date</th>
-						<th width="180px">From</th>
-						<th>Message</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for message in threads['comments']['data'] %}
+	<table class="u-full-width">
+		<thead>
+			<tr>
+				<th width="180px">Date</th>
+				<th width="180px">From</th>
+				<th>Message</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for message in threads['comments']['data'] %}
 
-						<tr {% if message['from']['id'] == session['fb_user'] %} class="info" {% endif %} >
-							<td>{{ message['created_time']|strftime }}</td>
-							<td>{{ message['from']['name'] }}</td>
-							<td>
-									{{ message['message'] }}		
+				<tr {% if message['from']['id'] == session['fb_user'] %} class="info" {% endif %} >
+					<td>{{ message['created_time']|strftime }}</td>
+					<td>{{ message['from']['name'] }}</td>
+					<td>
+							{{ message['message'] }}		
 
-							</td>
-						</tr>
+					</td>
+				</tr>
 
-					{% endfor %}
-				</tbody>
-			</table>
-
+			{% endfor %}
+		</tbody>
+	</table>
 
 
 
 
-				
 
-				<hr>
-				{% if debug %}
-					<h1>Request</h1>
-					<pre>
-						{{ hop }}
-					</pre>
-				{% endif %}
+		
 
-			</div>
-		</div>
+		<hr>
+		{% if debug %}
+			<h1>Request</h1>
+			<pre>
+				{{ hop }}
+			</pre>
+		{% endif %}
 
-</div><!-- /.container -->
+</div>
+
 {% endblock %}
