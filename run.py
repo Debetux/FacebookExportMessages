@@ -37,18 +37,22 @@ def _jinja2_filter_datetime(date_arg, fmt=None):
 def home():
 
     logged_in = False
-    hop = None
+
     if 'fb_user' in session:
         access_token = session['access_token']
         logged_in = True
 
-        try:
-            hop = json.loads(urllib.request.urlopen( "https://graph.facebook.com/me/inbox?" + urllib.parse.urlencode(dict(access_token=access_token))).read().decode('utf-8'))
+        inbox = requests.get(
+            'https://graph.facebook.com/me/inbox',
+            params={
+                'access_token': access_token
+            }
+        )
 
-        except urllib.error.HTTPError as e:
-            hop = "https://graph.facebook.com/me/inbox?" + urllib.parse.urlencode(dict(access_token=access_token))
+        if inbox.status_code == requests.codes.ok:
+            inbox = inbox.json()
 
-    return render_template('index.html', session = session, hop = hop, threads = hop, logged_in = logged_in)
+    return render_template('index.html', session=session, threads=inbox, logged_in=logged_in)
 
 
 @app.route('/thread/<thread_id>', methods=['GET', 'POST'])
