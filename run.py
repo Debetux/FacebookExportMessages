@@ -8,6 +8,16 @@ import os
 import tasks
 from settings import *
 
+if __name__ == '__main__':
+    if 'test' in sys.argv:
+        env_dir = os.path.join('tests', 'envdir')
+    else:
+        env_dir = 'envdir'
+    env_vars = glob.glob(os.path.join(env_dir, '*'))
+    for env_var in env_vars:
+        with open(env_var, 'r') as env_var_file:
+            os.environ.setdefault(env_var.split(os.sep)[-1],
+                                  env_var_file.read().strip())
 
 app = Flask(__name__)
 app.config.from_object(__name__)
