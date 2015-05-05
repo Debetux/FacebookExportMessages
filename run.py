@@ -37,6 +37,7 @@ def _jinja2_filter_datetime(date_arg, fmt=None):
 def home():
 
     logged_in = False
+    inbox = None
 
     if 'fb_user' in session:
         access_token = session['access_token']

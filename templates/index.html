@@ -19,6 +19,7 @@
 								<th>#</th>
 								<th>ID</th>
 								<th>Recipients</th>
+								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -34,6 +35,9 @@
 												{% endif %}
 											{% endfor %}		
 
+									</td>
+									<td>
+										<a type="button" class="btn btn-primary btn-xs" href="{{ url_for('download_thread', thread_id = thread['id']) }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> Generate CSV file</a>
 									</td>
 								</tr>
 
