@@ -8,6 +8,7 @@ import os
 import tasks
 
 from app import app
+from models import User
 
 
 @app.template_filter('strftime')
