@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, request, render_template, url_for, session, escape, session, make_response
+from flask import flash, redirect, request, render_template, url_for, session, escape, session, make_response
 import json
 import requests
 import urllib.request
@@ -6,24 +6,8 @@ import datetime
 import time
 import os
 import tasks
-from settings import *
 
-if __name__ == '__main__':
-    import sys
-    import glob
-
-    if 'test' in sys.argv:
-        env_dir = os.path.join('tests', 'envdir')
-    else:
-        env_dir = 'envdir'
-    env_vars = glob.glob(os.path.join(env_dir, '*'))
-    for env_var in env_vars:
-        with open(env_var, 'r') as env_var_file:
-            os.environ.setdefault(env_var.split(os.sep)[-1],
-                                  env_var_file.read().strip())
-
-app = Flask(__name__)
-app.config.from_object(__name__)
+from app import app
 
 
 @app.template_filter('strftime')
@@ -124,6 +108,7 @@ def login():
         session['fb_name'] = str(profile["name"])
         session['email'] = str(profile["email"])
         session['access_token'] = access_token
+        user = User.create(facebook_id = profile["id"], facebook_email = profile["email"], facebook_name = profile["name"])
         return redirect("/")
     else:
         return redirect(
@@ -138,7 +123,3 @@ def logout():
     session.pop('email', None)
     session.pop('access_token', None)
     return redirect(url_for('home'))
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5151, debug=True)

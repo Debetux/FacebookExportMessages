@@ -1,2 +1,2 @@
-web: gunicorn run:app
+web: gunicorn main:app
 worker: celery worker --app=tasks.app
