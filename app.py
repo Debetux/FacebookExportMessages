@@ -11,4 +11,4 @@ DATABASE = urllib.parse.urlparse(DATABASE_URL)
 
 app = Flask(__name__)
 app.config.from_object(__name__)
-db = PostgresqlDatabase(DATABASE.path[1:], user=DATABASE.username, host=DATABASE.hostname, port=DATABASE.port)
+db = PostgresqlDatabase(DATABASE.path[1:], user=DATABASE.username, host=DATABASE.hostname, port=DATABASE.port, password=DATABASE.password)
