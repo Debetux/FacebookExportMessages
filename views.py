@@ -110,7 +110,14 @@ def login():
         session['fb_name'] = str(profile["name"])
         session['email'] = str(profile["email"])
         session['access_token'] = access_token
-        user = User.create(facebook_id = profile["id"], facebook_email = profile["email"], facebook_name = profile["name"])
+
+        try:
+            with db.atomic():
+                user = User.create(facebook_id = profile["id"], facebook_email = profile["email"], facebook_name = profile["name"])
+
+        except peewee.IntegrityError:
+            user = User.get(User.facebook_id == profile["id"])
+
         return redirect("/")
     else:
         return redirect(
