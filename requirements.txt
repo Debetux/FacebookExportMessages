@@ -7,3 +7,4 @@ requests
 gunicorn
 celery[redis]
 peewee
+psycopg2
