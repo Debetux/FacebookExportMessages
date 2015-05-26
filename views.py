@@ -6,6 +6,7 @@ import datetime
 import time
 import os
 import tasks
+from settings import *
 
 from app import app
 from models import User
